@@ -1,5 +1,5 @@
 /**
- * This module is about typelevel unsigned integers in binaray representation.
+ * This module is about typelevel unsigned decimal integers.
  *
  * It's main type is `Binary`.
  *
@@ -9,20 +9,15 @@
  * @since 1.0.0
  * @example
  *   import { assert as assertType, IsExact } from 'conditional-type-checks';
- *   import {
- *     Parse,
- *     Print,
- *     Add,
- *     B0,
- *     B1,
- *   } from '@no-day/fp-ts-char/unsigned-decimal';
+ *   import { Add } from '@no-day/fp-ts-char/unsigned-decimal';
  *
- *   type A = Parse<'101110100'>;
- *   type B = Parse<'100101110'>;
+ *   type A = FromDigits<[1, 3, 4]>;
+ *   type B = FromDigits<[7, 8]>;
  *
- *   type SumAB = Add<A, B>;
+ *   type Actual = Add<A, B>;
+ *   type Expected = FromDigits<[2, 1, 2]>;
  *
- *   assertType<IsExact<Print<SumAB>, '1010100010'>>(true);
+ *   assertType<IsExact<Actual, Expected>>(true);
  */
 
 import * as Ops from './ops';
@@ -39,14 +34,14 @@ import { IsExact } from 'conditional-type-checks';
  * @since 1.0.0
  * @category Model
  */
-export type UnsignedDecimal<T extends UnsignedDecimal_ = UnsignedDecimal_> = {
+export type UnsignedDecimal<T extends Digits = Digits> = {
   readonly UnsignedDecimal: unique symbol;
   internal: T;
 };
 
-type UnsignedDecimal_ = Digit[];
+export type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
-type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+export type Digits = [Exclude<Digit, 0>, ...Digit[]];
 
 // -----------------------------------------------------------------------------
 // Constructors
@@ -61,12 +56,12 @@ type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
  *   import { assert as assertType, IsExact } from 'conditional-type-checks';
  *   import { Parse } from '@no-day/fp-ts-char/unsigned-decimal';
  *
- *   type Actual = Print<Parse<'10110'>>;
- *   type Expected = '10110';
- *
- *   assertType<IsExact<Actual, Expected>>(true);
+ *   type N = FromDigits<[1, 3, 5]>;
  */
-export type Parse<s extends string> = Returns<UnsignedDecimal, Parse_<s>>;
+export type FromDigits<ds extends Digits> = Returns<
+  UnsignedDecimal,
+  FromDigits_<ds>
+>;
 
 /**
  * It's a Char
@@ -75,14 +70,40 @@ export type Parse<s extends string> = Returns<UnsignedDecimal, Parse_<s>>;
  * @category Constructors
  * @example
  *   import { assert as assertType, IsExact } from 'conditional-type-checks';
- *   import { Print, Parse } from '@no-day/fp-ts-char/unsigned-decimal';
+ *   import { Print, FromDigits } from '@no-day/fp-ts-char/unsigned-decimal';
  *
- *   type Actual = Print<Parse<'10110'>>;
- *   type Expected = '10110';
+ *   type Actual = Print<FromDigits<1, 5, 8>>;
+ *   type Expected = '158';
  *
  *   assertType<IsExact<Actual, Expected>>(true);
  */
 export type Print<b extends UnsignedDecimal> = Returns<string, Print_<b>>;
+
+// -----------------------------------------------------------------------------
+// Destructors
+// -----------------------------------------------------------------------------
+
+/**
+ * It's a Char
+ *
+ * @since 1.0.0
+ * @category Constructors
+ * @example
+ *   import { assert as assertType, IsExact } from 'conditional-type-checks';
+ *   import {
+ *     FromDigits,
+ *     ToDigits,
+ *   } from '@no-day/fp-ts-char/unsigned-decimal';
+ *
+ *   type Actual = ToDigits<FromDigits<[1, 7, 8]>>;
+ *   type Expected = [1, 7, 8];
+ *
+ *   assertType<IsExact<Actual, Expected>>(true);
+ */
+export type ToDigits<i extends UnsignedDecimal> = Returns<
+  Digit[],
+  ToDigits_<i>
+>;
 
 // -----------------------------------------------------------------------------
 // Operations
@@ -95,9 +116,15 @@ export type Print<b extends UnsignedDecimal> = Returns<string, Print_<b>>;
  * @category Operations
  * @example
  *   import { assert as assertType, IsExact } from 'conditional-type-checks';
- *   import { Add, Parse } from '@no-day/fp-ts-char/unsigned-decimal';
+ *   import { Add } from '@no-day/fp-ts-char/unsigned-decimal';
  *
- *   assertType<IsExact<Add<Parse<'123'>, Parse<'47'>>, Parse<'34'>>>(true);
+ *   type A = FromDigits<[1, 3, 4]>;
+ *   type B = FromDigits<[7, 8]>;
+ *
+ *   type Actual = Add<A, B>;
+ *   type Expected = FromDigits<[2, 1, 2]>;
+ *
+ *   assertType<IsExact<Actual, Expected>>(true);
  */
 export type Add<
   n1 extends UnsignedDecimal,
@@ -113,7 +140,7 @@ export type Add<
  *   import { assert as assertType, IsExact } from 'conditional-type-checks';
  *   import { Eq, Parse } from '@no-day/fp-ts-char/unsigned-decimal';
  *
- *   type Actual = Eq<Parse<'123'>, Parse<'123'>>;
+ *   type Actual = Eq<FromDigits<[1, 2, 3]>, FromDigits<[1, 2, 3]>>;
  *   type Expected = true;
  *
  *   assertType<IsExact<Actual, Expected>>(true);
@@ -441,11 +468,11 @@ type EnumFromTo_<from extends UnsignedDecimal, to extends UnsignedDecimal> = Eq<
   ? [to]
   : [from, ...EnumFromTo_<Add<from, UnsignedDecimal<[1]>>, to>];
 
-type Parse_<s extends string> = UnsignedDecimal<
-  Ops.Parse<ParseDigitURI, Digit, s>
->;
-
 type Print_<d extends UnsignedDecimal> = Ops.Print<
   PrintDigitURI,
   d['internal']
 >;
+
+type FromDigits_<ds extends Digits> = UnsignedDecimal<ds>;
+
+type ToDigits_<i extends UnsignedDecimal> = i['internal'];

@@ -1,12 +1,17 @@
 import { assert as assertType, IsExact } from 'conditional-type-checks';
-import { Parse, Print, Add } from '../src/unsigned-decimal';
+import {
+  FromDigits,
+  Print,
+  Add,
+  UnsignedDecimal,
+  ToDigits,
+} from '../src/unsigned-decimal';
+import { Returns } from '../src/types';
 
-type A = Parse<'3'>;
-type B = Parse<'16'>;
+type A = FromDigits<[1, 3, 4]>;
+type B = FromDigits<[7, 8]>;
 
-type SumAB = Add<A, B>;
-
-type Actual = Print<SumAB>;
-type Expected = '19';
+type Actual = Add<A, B>;
+type Expected = FromDigits<[2, 1, 2]>;
 
 assertType<IsExact<Actual, Expected>>(true);
