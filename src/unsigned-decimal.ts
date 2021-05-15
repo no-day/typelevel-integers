@@ -34,14 +34,18 @@ import { IsExact } from 'conditional-type-checks';
  * @since 1.0.0
  * @category Model
  */
-export type UnsignedDecimal<T extends Digits = Digits> = {
+export type UnsignedDecimal<spec extends Spec = Spec> = {
   readonly UnsignedDecimal: unique symbol;
-  internal: T;
+  internal: spec;
 };
+
+export type Spec = { sign: Sign; digits: Digits };
+
+type Sign = 'Positive' | 'Negative';
 
 export type Digit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
-export type Digits = [Exclude<Digit, 0>, ...Digit[]];
+export type Digits = [Exclude<Digit, 0>, ...Digit[]] | [0];
 
 // -----------------------------------------------------------------------------
 // Constructors
@@ -77,7 +81,7 @@ export type FromDigits<ds extends Digits> = Returns<
  *
  *   assertType<IsExact<Actual, Expected>>(true);
  */
-export type Print<b extends UnsignedDecimal> = Returns<string, Print_<b>>;
+// export type Print<b extends UnsignedDecimal> = Returns<string, Print_<b>>;
 
 // -----------------------------------------------------------------------------
 // Destructors
@@ -159,231 +163,81 @@ const AddDigitsURI = 'UnignedDecimal.AddDigits';
 
 type AddDigitsURI = typeof AddDigitsURI;
 
-type AddDigits<d1, d2> = { a: [d1]; b: [d2] } extends infer d
-  ? // 0
-    d extends { a: [0]; b: [0] }
-    ? [0]
-    : d extends { a: [0]; b: [1] }
-    ? [1]
-    : d extends { a: [0]; b: [2] }
-    ? [2]
-    : d extends { a: [0]; b: [2] }
-    ? [2]
-    : d extends { a: [0]; b: [3] }
-    ? [3]
-    : d extends { a: [0]; b: [4] }
-    ? [4]
-    : d extends { a: [0]; b: [5] }
-    ? [5]
-    : d extends { a: [0]; b: [6] }
-    ? [6]
-    : d extends { a: [0]; b: [7] }
-    ? [7]
-    : d extends { a: [0]; b: [8] }
-    ? [8]
-    : d extends { a: [0]; b: [9] }
-    ? [9]
-    : // 1
-    d extends { a: [1]; b: [0] }
-    ? [1]
-    : d extends { a: [1]; b: [1] }
-    ? [2]
-    : d extends { a: [1]; b: [2] }
-    ? [3]
-    : d extends { a: [1]; b: [3] }
-    ? [4]
-    : d extends { a: [1]; b: [4] }
-    ? [5]
-    : d extends { a: [1]; b: [5] }
-    ? [6]
-    : d extends { a: [1]; b: [6] }
-    ? [7]
-    : d extends { a: [1]; b: [7] }
-    ? [8]
-    : d extends { a: [1]; b: [8] }
-    ? [9]
-    : d extends { a: [1]; b: [9] }
-    ? [1, 0]
-    : // 2
-    d extends { a: [2]; b: [0] }
-    ? [2]
-    : d extends { a: [2]; b: [1] }
-    ? [3]
-    : d extends { a: [2]; b: [2] }
-    ? [4]
-    : d extends { a: [2]; b: [3] }
-    ? [5]
-    : d extends { a: [2]; b: [4] }
-    ? [6]
-    : d extends { a: [2]; b: [5] }
-    ? [7]
-    : d extends { a: [2]; b: [6] }
-    ? [8]
-    : d extends { a: [2]; b: [7] }
-    ? [9]
-    : d extends { a: [2]; b: [8] }
-    ? [1, 0]
-    : d extends { a: [2]; b: [9] }
-    ? [1, 1]
-    : // 3
-    d extends { a: [3]; b: [0] }
-    ? [3]
-    : d extends { a: [3]; b: [1] }
-    ? [4]
-    : d extends { a: [3]; b: [2] }
-    ? [5]
-    : d extends { a: [3]; b: [3] }
-    ? [6]
-    : d extends { a: [3]; b: [4] }
-    ? [7]
-    : d extends { a: [3]; b: [5] }
-    ? [8]
-    : d extends { a: [3]; b: [6] }
-    ? [9]
-    : d extends { a: [3]; b: [7] }
-    ? [1, 0]
-    : d extends { a: [3]; b: [8] }
-    ? [1, 1]
-    : d extends { a: [3]; b: [9] }
-    ? [1, 2]
-    : // 4
-    d extends { a: [4]; b: [0] }
-    ? [4]
-    : d extends { a: [4]; b: [1] }
-    ? [5]
-    : d extends { a: [4]; b: [2] }
-    ? [6]
-    : d extends { a: [4]; b: [3] }
-    ? [7]
-    : d extends { a: [4]; b: [4] }
-    ? [8]
-    : d extends { a: [4]; b: [5] }
-    ? [9]
-    : d extends { a: [4]; b: [6] }
-    ? [1, 0]
-    : d extends { a: [4]; b: [7] }
-    ? [1, 1]
-    : d extends { a: [4]; b: [8] }
-    ? [1, 2]
-    : d extends { a: [4]; b: [9] }
-    ? [1, 3]
-    : // 5
-    d extends { a: [5]; b: [0] }
-    ? [5]
-    : d extends { a: [5]; b: [1] }
-    ? [6]
-    : d extends { a: [5]; b: [2] }
-    ? [7]
-    : d extends { a: [5]; b: [3] }
-    ? [8]
-    : d extends { a: [5]; b: [4] }
-    ? [9]
-    : d extends { a: [5]; b: [5] }
-    ? [1, 0]
-    : d extends { a: [5]; b: [6] }
-    ? [1, 1]
-    : d extends { a: [5]; b: [7] }
-    ? [1, 2]
-    : d extends { a: [5]; b: [8] }
-    ? [1, 3]
-    : d extends { a: [5]; b: [9] }
-    ? [1, 4]
-    : // 6
-    d extends { a: [6]; b: [0] }
-    ? [6]
-    : d extends { a: [6]; b: [1] }
-    ? [7]
-    : d extends { a: [6]; b: [2] }
-    ? [8]
-    : d extends { a: [6]; b: [3] }
-    ? [9]
-    : d extends { a: [6]; b: [4] }
-    ? [1, 0]
-    : d extends { a: [6]; b: [5] }
-    ? [1, 1]
-    : d extends { a: [6]; b: [6] }
-    ? [1, 2]
-    : d extends { a: [6]; b: [7] }
-    ? [1, 3]
-    : d extends { a: [6]; b: [8] }
-    ? [1, 4]
-    : d extends { a: [6]; b: [9] }
-    ? [1, 5]
-    : // 7
-    d extends { a: [7]; b: [0] }
-    ? [7]
-    : d extends { a: [7]; b: [1] }
-    ? [8]
-    : d extends { a: [7]; b: [2] }
-    ? [9]
-    : d extends { a: [7]; b: [3] }
-    ? [1, 0]
-    : d extends { a: [7]; b: [4] }
-    ? [1, 1]
-    : d extends { a: [7]; b: [5] }
-    ? [1, 2]
-    : d extends { a: [7]; b: [6] }
-    ? [1, 3]
-    : d extends { a: [7]; b: [7] }
-    ? [1, 4]
-    : d extends { a: [7]; b: [8] }
-    ? [1, 5]
-    : d extends { a: [7]; b: [9] }
-    ? [1, 6]
-    : // 8
-    d extends { a: [8]; b: [0] }
-    ? [8]
-    : d extends { a: [8]; b: [1] }
-    ? [9]
-    : d extends { a: [8]; b: [2] }
-    ? [1, 0]
-    : d extends { a: [8]; b: [3] }
-    ? [1, 1]
-    : d extends { a: [8]; b: [4] }
-    ? [1, 2]
-    : d extends { a: [8]; b: [5] }
-    ? [1, 3]
-    : d extends { a: [8]; b: [6] }
-    ? [1, 4]
-    : d extends { a: [8]; b: [7] }
-    ? [1, 5]
-    : d extends { a: [8]; b: [8] }
-    ? [1, 6]
-    : d extends { a: [8]; b: [9] }
-    ? [1, 7]
-    : // 9
-    d extends { a: [9]; b: [0] }
-    ? [9]
-    : d extends { a: [9]; b: [1] }
-    ? [1, 0]
-    : d extends { a: [9]; b: [2] }
-    ? [1, 1]
-    : d extends { a: [9]; b: [3] }
-    ? [1, 2]
-    : d extends { a: [9]; b: [4] }
-    ? [1, 3]
-    : d extends { a: [9]; b: [5] }
-    ? [1, 4]
-    : d extends { a: [9]; b: [6] }
-    ? [1, 5]
-    : d extends { a: [9]; b: [7] }
-    ? [1, 6]
-    : d extends { a: [9]; b: [8] }
-    ? [1, 7]
-    : d extends { a: [9]; b: [9] }
-    ? [1, 8]
-    : never
-  : never;
+type NextDigit<d extends Digit> = {
+  0: 1;
+  1: 2;
+  2: 3;
+  3: 4;
+  4: 5;
+  5: 6;
+  6: 7;
+  7: 8;
+  8: 9;
+  9: 0;
+}[d];
 
-declare module 'fp-ts/HKT' {
-  interface URItoKind2<E, A> {
-    readonly [AddDigitsURI]: AddDigits<E, A>;
-  }
-}
+type PrevDigit<d extends Digit> = {
+  0: 9;
+  1: 0;
+  2: 1;
+  3: 2;
+  4: 3;
+  5: 4;
+  6: 5;
+  7: 6;
+  8: 7;
+  9: 8;
+}[d];
 
-const PrintDigitURI = 'UnignedDecimal.PrintDigit';
+type AddDigit<
+  d1 extends Digit,
+  d2 extends Digit,
+  carry extends boolean = false
+> = Returns<
+  { carry: boolean; digit: Digit },
+  d1 extends 0
+    ? { carry: carry; digit: d2 }
+    : AddDigit<
+        PrevDigit<d1>,
+        NextDigit<d2>,
+        Or<carry, Extends<NextDigit<d2>, 0>>
+      >
+>;
 
-type PrintDigitURI = typeof PrintDigitURI;
+type AddDigits<n1 extends Digit[], n2 extends Digit[]> = Returns<
+  Digit[],
+  n1 extends []
+    ? n2
+    : // first empty
+
+    n2 extends []
+    ? n1
+    : // second empty
+
+    [n1, n2] extends [
+        [...infer digits1, infer digit1],
+        [...infer digits2, infer digit2]
+      ]
+    ? AddDigit<As<digit1, Digit>, As<digit2, Digit>> extends {
+        carry: infer carry;
+        digit: infer digit;
+      }
+      ? [
+          ...AddDigits<
+            As<digits1, Digit[]>,
+            If<
+              As<carry, boolean>,
+              AddDigits<As<digits2, Digit[]>, [1]>,
+              As<digits2, Digit[]>
+            >
+          >,
+          digit
+        ]
+      : never
+    : // both full
+
+      never
+>;
 
 type PrintDigit<D> = D extends 0
   ? '0'
@@ -406,12 +260,6 @@ type PrintDigit<D> = D extends 0
   : D extends 9
   ? '9'
   : never;
-
-declare module 'fp-ts/HKT' {
-  interface URItoKind<A> {
-    readonly [PrintDigitURI]: PrintDigit<A>;
-  }
-}
 
 const ParseDigitURI = 'UnignedDecimal.ParseDigit';
 
@@ -439,40 +287,117 @@ type ParseDigit<D> = D extends '0'
   ? 9
   : never;
 
-declare module 'fp-ts/HKT' {
-  interface URItoKind<A> {
-    readonly [ParseDigitURI]: ParseDigit<A>;
-  }
-}
-
 // -----------------------------------------------------------------------------
 // Internal Wrapper
 // -----------------------------------------------------------------------------
 
-type Add_<
-  n1 extends UnsignedDecimal,
-  n2 extends UnsignedDecimal
-> = UnsignedDecimal<
-  Ops.Add<AddDigitsURI, Digit, n1['internal'], n2['internal']>
+type GetSign<n extends UnsignedDecimal> = n['internal']['sign'];
+type GetDigits<n extends UnsignedDecimal> = n['internal']['digits'];
+
+// type Add_<n1 extends UnsignedDecimal, n2 extends UnsignedDecimal> = Switch<
+//   [
+//     [
+//       When<
+//         And<Extends<GetSign<n1>, 'Positive'>, Extends<GetSign<n2>, 'Positive'>>,
+//         UnsignedDecimal<{
+//           sign: 'Positive';
+//           digits: AddDigits<GetDigits<n1>, GetDigits<n2>>;
+//         }>
+//       >
+//     ],
+//     [When<Extends<GetSign<n1>, 'Positive'>, 2>],
+//     [When<Extends<GetSign<n2>, 'Positive'>, 3>]
+//   ]
+// >;
+
+type Add_<n1 extends UnsignedDecimal, n2 extends UnsignedDecimal> = Match<
+  [GetSign<n1>, GetSign<n2>],
+  [
+    [
+      ['Positive', 'Positive'],
+      UnsignedDecimal<{
+        sign: 'Positive';
+        digits: AddDigits<GetDigits<n1>, GetDigits<n2>>;
+      }>
+    ],
+    [
+      ['Positive', any],
+      UnsignedDecimal<{
+        sign: 'Positive';
+        digits: AddDigits<GetDigits<n1>, GetDigits<n2>>;
+      }>
+    ]
+  ]
 >;
+
+//UnsignedDecimal<{ sign: n1 extends [] ? n2 : never>;
 
 type Eq_<n1 extends UnsignedDecimal, n2 extends UnsignedDecimal> = IsExact<
   n1['internal'],
   n2['internal']
 >;
 
-type EnumFromTo_<from extends UnsignedDecimal, to extends UnsignedDecimal> = Eq<
-  from,
-  to
-> extends true
-  ? [to]
-  : [from, ...EnumFromTo_<Add<from, UnsignedDecimal<[1]>>, to>];
+// type EnumFromTo_<from extends UnsignedDecimal, to extends UnsignedDecimal> = Eq<
+//   from,
+//   to
+// > extends true
+//   ? [to]
+//   : [from, ...EnumFromTo_<Add<from, UnsignedDecimal<[1]>>, to>];
 
-type Print_<d extends UnsignedDecimal> = Ops.Print<
-  PrintDigitURI,
-  d['internal']
->;
+// type Print_<d extends UnsignedDecimal> = Ops.Print<
+//   PrintDigitURI,
+//   d['internal']['digits']
+// >;
 
-type FromDigits_<ds extends Digits> = UnsignedDecimal<ds>;
+type FromDigits_<ds extends Digits> = UnsignedDecimal<{
+  sign: 'Positive';
+  digits: ds;
+}>;
 
-type ToDigits_<i extends UnsignedDecimal> = i['internal'];
+type ToDigits_<i extends UnsignedDecimal> = i['internal']['digits'];
+
+// -----------------------------------------------------------------------------
+// Util
+// -----------------------------------------------------------------------------
+
+type Extends<T, G> = T extends G ? true : false;
+
+type Or<b1 extends boolean, b2 extends boolean> = b1 extends true
+  ? true
+  : b2 extends true
+  ? true
+  : false;
+
+type And<b1 extends boolean, b2 extends boolean> = b1 extends true
+  ? b2 extends true
+    ? true
+    : false
+  : false;
+
+type If<B extends boolean, X, Y> = B extends true ? X : Y;
+
+type Switch<Cases extends any[]> = Cases extends [
+  infer headCases,
+  ...infer tailCases
+]
+  ? If<IsNever<headCases>, Switch<tailCases>, headCases>
+  : never;
+
+type IsNever<T> = [T] extends [never] ? true : false;
+
+type When<B, T> = B extends true ? T : never;
+
+type Unsnoc<T extends [any, ...any[]]> = T extends [...infer init, infer last]
+  ? { init: init; last: last }
+  : never;
+
+type Match<T, Cases extends [T, any][]> = Cases extends [
+  [infer a, infer b],
+  ...infer tailCases
+]
+  ? T extends a
+    ? b
+    : Match<T, tailCases & [T, any][]>
+  : never;
+
+type As<T, G> = T extends G ? T : never;
