@@ -13,7 +13,7 @@
     "markdown-magic": "^2.0.0",
     "prettier": "^2.2.1",
     "prettier-plugin-jsdoc": "^0.3.13",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.4"
   },
   "scripts": {
     "test": "yarn jest",

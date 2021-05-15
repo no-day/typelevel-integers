@@ -20,7 +20,6 @@
  *   assertType<IsExact<Actual, Expected>>(true);
  */
 
-import * as Ops from './ops';
 import { Returns } from './types';
 import { IsExact } from 'conditional-type-checks';
 
@@ -34,12 +33,12 @@ import { IsExact } from 'conditional-type-checks';
  * @since 1.0.0
  * @category Model
  */
-export type UnsignedDecimal<spec extends Spec = Spec> = {
+export type Int<spec extends Spec = Spec> = {
   readonly UnsignedDecimal: unique symbol;
   internal: spec;
 };
 
-export type Spec = { sign: Sign; digits: Digits };
+type Spec = { sign: Sign; digits: Digits };
 
 type Sign = 'Positive' | 'Negative';
 
@@ -62,26 +61,7 @@ export type Digits = [Exclude<Digit, 0>, ...Digit[]] | [0];
  *
  *   type N = FromDigits<[1, 3, 5]>;
  */
-export type FromDigits<ds extends Digits> = Returns<
-  UnsignedDecimal,
-  FromDigits_<ds>
->;
-
-/**
- * It's a Char
- *
- * @since 1.0.0
- * @category Constructors
- * @example
- *   import { assert as assertType, IsExact } from 'conditional-type-checks';
- *   import { Print, FromDigits } from '@no-day/fp-ts-char/unsigned-decimal';
- *
- *   type Actual = Print<FromDigits<1, 5, 8>>;
- *   type Expected = '158';
- *
- *   assertType<IsExact<Actual, Expected>>(true);
- */
-// export type Print<b extends UnsignedDecimal> = Returns<string, Print_<b>>;
+export type FromDigits<ds extends Digits> = Returns<Int, FromDigits_<ds>>;
 
 // -----------------------------------------------------------------------------
 // Destructors
@@ -104,10 +84,23 @@ export type FromDigits<ds extends Digits> = Returns<
  *
  *   assertType<IsExact<Actual, Expected>>(true);
  */
-export type ToDigits<i extends UnsignedDecimal> = Returns<
-  Digit[],
-  ToDigits_<i>
->;
+export type ToDigits<i extends Int> = Returns<Digit[], ToDigits_<i>>;
+
+// /**
+//  * It's a Char
+//  *
+//  * @since 1.0.0
+//  * @category Constructors
+//  * @example
+//  *   import { assert as assertType, IsExact } from 'conditional-type-checks';
+//  *   import { Print, FromDigits } from '@no-day/fp-ts-char/unsigned-decimal';
+//  *
+//  *   type Actual = Print<FromDigits<1, 5, 8>>;
+//  *   type Expected = '158';
+//  *
+//  *   assertType<IsExact<Actual, Expected>>(true);
+//  */
+// export type Print<b extends UnsignedDecimal> = Returns<string, Print_<b>>;
 
 // -----------------------------------------------------------------------------
 // Operations
@@ -130,10 +123,7 @@ export type ToDigits<i extends UnsignedDecimal> = Returns<
  *
  *   assertType<IsExact<Actual, Expected>>(true);
  */
-export type Add<
-  n1 extends UnsignedDecimal,
-  n2 extends UnsignedDecimal
-> = Returns<UnsignedDecimal, Add_<n1, n2>>;
+export type Add<n1 extends Int, n2 extends Int> = Returns<Int, Add_<n1, n2>>;
 
 /**
  * It's a Char
@@ -150,18 +140,11 @@ export type Add<
  *   assertType<IsExact<Actual, Expected>>(true);
  */
 
-export type Eq<
-  n1 extends UnsignedDecimal,
-  n2 extends UnsignedDecimal
-> = Returns<boolean, Eq_<n1, n2>>;
+export type Eq<n1 extends Int, n2 extends Int> = Returns<boolean, Eq_<n1, n2>>;
 
 // -----------------------------------------------------------------------------
 // Internal
 // -----------------------------------------------------------------------------
-
-const AddDigitsURI = 'UnignedDecimal.AddDigits';
-
-type AddDigitsURI = typeof AddDigitsURI;
 
 type NextDigit<d extends Digit> = {
   0: 1;
@@ -193,51 +176,45 @@ type AddDigit<
   d1 extends Digit,
   d2 extends Digit,
   carry extends boolean = false
-> = Returns<
-  { carry: boolean; digit: Digit },
-  d1 extends 0
-    ? { carry: carry; digit: d2 }
-    : AddDigit<
-        PrevDigit<d1>,
-        NextDigit<d2>,
-        Or<carry, Extends<NextDigit<d2>, 0>>
-      >
->;
+> = d1 extends 0
+  ? { carry: carry; digit: d2 }
+  : AddDigit<
+      PrevDigit<d1>,
+      NextDigit<d2>,
+      Or<carry, Extends<NextDigit<d2>, 0>>
+    >;
 
-type AddDigits<n1 extends Digit[], n2 extends Digit[]> = Returns<
-  Digit[],
-  n1 extends []
-    ? n2
-    : // first empty
+type AddDigits<n1 extends Digit[], n2 extends Digit[]> = n1 extends []
+  ? n2
+  : // first empty
 
-    n2 extends []
-    ? n1
-    : // second empty
+  n2 extends []
+  ? n1
+  : // second empty
 
-    [n1, n2] extends [
-        [...infer digits1, infer digit1],
-        [...infer digits2, infer digit2]
+  [n1, n2] extends [
+      [...infer digits1, infer digit1],
+      [...infer digits2, infer digit2]
+    ]
+  ? AddDigit<As<digit1, Digit>, As<digit2, Digit>> extends {
+      carry: infer carry;
+      digit: infer digit;
+    }
+    ? [
+        ...AddDigits<
+          As<digits1, Digit[]>,
+          If<
+            As<carry, boolean>,
+            AddDigits<As<digits2, Digit[]>, [1]>,
+            As<digits2, Digit[]>
+          >
+        >,
+        digit extends Digit ? digit : never
       ]
-    ? AddDigit<As<digit1, Digit>, As<digit2, Digit>> extends {
-        carry: infer carry;
-        digit: infer digit;
-      }
-      ? [
-          ...AddDigits<
-            As<digits1, Digit[]>,
-            If<
-              As<carry, boolean>,
-              AddDigits<As<digits2, Digit[]>, [1]>,
-              As<digits2, Digit[]>
-            >
-          >,
-          digit
-        ]
-      : never
-    : // both full
+    : never
+  : // both full
 
-      never
->;
+    never;
 
 type PrintDigit<D> = D extends 0
   ? '0'
@@ -260,10 +237,6 @@ type PrintDigit<D> = D extends 0
   : D extends 9
   ? '9'
   : never;
-
-const ParseDigitURI = 'UnignedDecimal.ParseDigit';
-
-type ParseDigitURI = typeof ParseDigitURI;
 
 type ParseDigit<D> = D extends '0'
   ? 0
@@ -291,38 +264,22 @@ type ParseDigit<D> = D extends '0'
 // Internal Wrapper
 // -----------------------------------------------------------------------------
 
-type GetSign<n extends UnsignedDecimal> = n['internal']['sign'];
-type GetDigits<n extends UnsignedDecimal> = n['internal']['digits'];
+type GetSign<n extends Int> = n['internal']['sign'];
+type GetDigits<n extends Int> = n['internal']['digits'];
 
-// type Add_<n1 extends UnsignedDecimal, n2 extends UnsignedDecimal> = Switch<
-//   [
-//     [
-//       When<
-//         And<Extends<GetSign<n1>, 'Positive'>, Extends<GetSign<n2>, 'Positive'>>,
-//         UnsignedDecimal<{
-//           sign: 'Positive';
-//           digits: AddDigits<GetDigits<n1>, GetDigits<n2>>;
-//         }>
-//       >
-//     ],
-//     [When<Extends<GetSign<n1>, 'Positive'>, 2>],
-//     [When<Extends<GetSign<n2>, 'Positive'>, 3>]
-//   ]
-// >;
-
-type Add_<n1 extends UnsignedDecimal, n2 extends UnsignedDecimal> = Match<
+type Add_<n1 extends Int, n2 extends Int> = Match<
   [GetSign<n1>, GetSign<n2>],
   [
     [
       ['Positive', 'Positive'],
-      UnsignedDecimal<{
+      Int<{
         sign: 'Positive';
         digits: AddDigits<GetDigits<n1>, GetDigits<n2>>;
       }>
     ],
     [
       ['Positive', any],
-      UnsignedDecimal<{
+      Int<{
         sign: 'Positive';
         digits: AddDigits<GetDigits<n1>, GetDigits<n2>>;
       }>
@@ -332,7 +289,7 @@ type Add_<n1 extends UnsignedDecimal, n2 extends UnsignedDecimal> = Match<
 
 //UnsignedDecimal<{ sign: n1 extends [] ? n2 : never>;
 
-type Eq_<n1 extends UnsignedDecimal, n2 extends UnsignedDecimal> = IsExact<
+type Eq_<n1 extends Int, n2 extends Int> = IsExact<
   n1['internal'],
   n2['internal']
 >;
@@ -349,12 +306,12 @@ type Eq_<n1 extends UnsignedDecimal, n2 extends UnsignedDecimal> = IsExact<
 //   d['internal']['digits']
 // >;
 
-type FromDigits_<ds extends Digits> = UnsignedDecimal<{
+type FromDigits_<ds extends Digits> = Int<{
   sign: 'Positive';
   digits: ds;
 }>;
 
-type ToDigits_<i extends UnsignedDecimal> = i['internal']['digits'];
+type ToDigits_<i extends Int> = i['internal']['digits'];
 
 // -----------------------------------------------------------------------------
 // Util
