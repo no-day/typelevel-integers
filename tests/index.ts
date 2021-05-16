@@ -48,4 +48,51 @@ namespace Destructors {
       assertType<IsExact<Actual, Expected>>(true);
     }
   }
+
+  namespace ToNumber {
+    namespace N0 {
+      type Actual = T.ToDigits<T.FromNumber<0>>;
+      type Expected = [0];
+
+      assertType<IsExact<Actual, Expected>>(true);
+    }
+
+    namespace N10 {
+      type Actual = T.ToDigits<T.FromNumber<10>>;
+      type Expected = [1, 0];
+
+      assertType<IsExact<Actual, Expected>>(true);
+    }
+
+    namespace N20 {
+      type Actual = T.ToDigits<T.FromNumber<20>>;
+      type Expected = [2, 0];
+
+      assertType<IsExact<Actual, Expected>>(true);
+    }
+  }
+}
+
+namespace Operations {
+  namespace Add {
+    namespace Add_134_212 {
+      type A = T.FromDigits<[1, 3, 4]>;
+      type B = T.FromDigits<[7, 8]>;
+
+      type Actual = T.Add<A, B>;
+      type Expected = T.FromDigits<[2, 1, 2]>;
+
+      assertType<IsExact<Actual, Expected>>(true);
+    }
+
+    namespace Add_819442329_560390262 {
+      type A = T.FromDigits<[8, 1, 9, 4, 4, 2, 3, 2, 9]>;
+      type B = T.FromDigits<[5, 6, 0, 3, 9, 0, 2, 6, 2]>;
+
+      type Actual = T.Add<A, B>;
+      type Expected = T.FromDigits<[1, 3, 7, 9, 8, 3, 2, 5, 9, 1]>;
+
+      assertType<IsExact<Actual, Expected>>(true);
+    }
+  }
 }
