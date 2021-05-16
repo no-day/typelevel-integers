@@ -17,8 +17,8 @@
     "typescript": "^4.2.4"
   },
   "scripts": {
-    "test": "yarn jest",
-    "test:watch": "yarn jest --watch",
+    "test": "yarn tsc -p tsconfig.test.json",
+    "test:watch": "yarn tsc --watch -p tsconfig.test.json",
     "build": "yarn tsc",
     "build:watch": "yarn tsc --watch",
     "prepublish": "yarn build",
