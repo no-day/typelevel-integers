@@ -1,3 +1,1 @@
-# Prior art
-
--
+# typelevel-integers
