@@ -292,8 +292,6 @@ type Add_<n1 extends Int, n2 extends Int> = Match<
   ]
 >;
 
-//UnsignedDecimal<{ sign: n1 extends [] ? n2 : never>;
-
 type Eq_<n1 extends Int, n2 extends Int> = IsExact<
   n1['internal'],
   n2['internal']
