@@ -95,4 +95,18 @@ namespace Operations {
       assertType<IsExact<Actual, Expected>>(true);
     }
   }
+
+  namespace Succ {
+    type Actual = T.Succ<T.FromDigits<[1, 2, 3]>>;
+    type Expected = T.FromDigits<[1, 2, 4]>;
+
+    assertType<IsExact<Actual, Expected>>(true);
+  }
+
+  namespace Eq {
+    type Actual = T.Eq<T.FromDigits<[1, 2, 3]>, T.FromDigits<[1, 2, 3]>>;
+    type Expected = true;
+
+    assertType<IsExact<Actual, Expected>>(true);
+  }
 }
